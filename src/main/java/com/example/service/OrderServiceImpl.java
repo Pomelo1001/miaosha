@@ -1,11 +1,9 @@
 package com.example.service;
 
-import com.alibaba.druid.sql.visitor.functions.Right;
 import com.example.dao.OrderDAO;
 import com.example.dao.StockDAO;
 import com.example.entity.Order;
 import com.example.entity.Stock;
-import org.apache.logging.log4j.message.ReusableMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
