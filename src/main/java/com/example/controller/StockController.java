@@ -1,9 +1,11 @@
 package com.example.controller;
 
 import com.example.service.OrderService;
+import com.example.service.UserService;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +28,12 @@ public class StockController {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
     RateLimiter rateLimiter = RateLimiter.create(100);
 
 
@@ -33,9 +41,9 @@ public class StockController {
     @GetMapping("kill")
     public String kill(Integer id) {
         try {
-            log.info("the order id is :{}",id);
-            if (!rateLimiter.tryAcquire(5, TimeUnit.SECONDS)){
-               log.error("当前请求被限流，无法完成后续处理逻辑.....");
+            log.info("the order id is :{}", id);
+            if (!rateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
+                log.error("当前请求被限流，无法完成后续处理逻辑.....");
                 return "秒杀失败";
             }
             int orderId = orderService.kill(id);
@@ -44,6 +52,12 @@ public class StockController {
             e.printStackTrace();
             return e.getMessage();
         }
+    }
+
+    @GetMapping("getMd5")
+    public String getMD5(Integer userId, String password) {
+        userService.findById(userId);
+        return null;
     }
 }
 
