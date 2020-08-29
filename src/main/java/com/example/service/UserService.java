@@ -1,7 +1,5 @@
 package com.example.service;
 
-import com.example.entity.User;
-
 /**
  * @version 1.1.0
  * @author：caopu
@@ -10,9 +8,15 @@ import com.example.entity.User;
  */
 public interface UserService {
     /**
-     * 查询用户信息
+     * 判断单位时间内调用次数
      * @param userId
      * @return
      */
-    User findById(Integer userId);
+    boolean getUserCount(Integer userId);
+
+    /**向redis中写入用户访问次数
+     * @param userId
+     * @return
+     */
+    int saveUserCount(Integer userId);
 }
