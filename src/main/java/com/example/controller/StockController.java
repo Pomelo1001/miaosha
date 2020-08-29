@@ -31,8 +31,6 @@ public class StockController {
     @Autowired
     UserService userService;
 
-    @Autowired
-    StringRedisTemplate stringRedisTemplate;
 
     RateLimiter rateLimiter = RateLimiter.create(100);
 
@@ -41,8 +39,7 @@ public class StockController {
     @GetMapping("kill")
     public String kill(Integer id) {
         try {
-            log.info("the order id is :{}", id);
-            if (!rateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
+            if (!rateLimiter.tryAcquire(1, TimeUnit.SECONDS)) {
                 log.error("当前请求被限流，无法完成后续处理逻辑.....");
                 return "秒杀失败";
             }

@@ -4,7 +4,9 @@ import com.example.dao.OrderDAO;
 import com.example.dao.StockDAO;
 import com.example.entity.Order;
 import com.example.entity.Stock;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import java.util.Date;
  */
 @Service
 @Transactional
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
 
@@ -29,9 +32,19 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderDAO orderDAO;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     public int kill(Integer id) {
+
+        //redis缓存预热，设置缓存失效时间，限时进行抢购
+//        if (!stringRedisTemplate.hasKey("kill" + id)) {
+//            log.error("抢购超时，当前活动过于火爆，已经结束！");
+//            throw new RuntimeException("抢购超时，当前活动已经结束！");
+//        }
+
         //校验库存
         Stock stock = checkStock(id);
         //扣减库存
@@ -39,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
         //生成订单
         return createOrder(stock);
 
-}
+    }
 
     //校验库存
     private Stock checkStock(Integer id) {
@@ -53,8 +66,9 @@ public class OrderServiceImpl implements OrderService {
     //扣减库存
     private void updateSale(Stock stock) {
         int updateRows = stockDAO.updateSale(stock);
-        if (updateRows == 0){
-            throw new RuntimeException("请购失败，请重试！");
+        if (updateRows == 0) {
+            log.error("抢购失败，请重试！");
+            throw new RuntimeException("抢购失败，请重试！");
         }
     }
 
